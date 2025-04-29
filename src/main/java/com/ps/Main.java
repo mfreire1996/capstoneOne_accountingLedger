@@ -145,10 +145,13 @@ public class Main {
         switch (ledgerMenuCommands) {
             case 1:
                 viewingDeposits();
+                break;
             case 2:
                 viewingPayments();
+                break;
             case 3:
                 viewingReports();
+                break;
             case 0:
                 System.out.println("Going back...");
                 break;
@@ -170,8 +173,8 @@ public class Main {
     private static void viewingPayments() {
         for (int i = transactions.size() - 1; i >= 0; i++) {
             Transaction transaction = transactions.get(i);
-            double amoutPaid = transaction.getAmount();
-            if (amoutPaid < 0) {
+            double amountPaid = transaction.getAmount();
+            if (amountPaid < 0) {
                 System.out.println(transaction);
             }
         }
@@ -242,7 +245,20 @@ public class Main {
     }
 
     private static void previousMonth() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date today = new Date();
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTime(today);
+        int currentMonth = currentCal.get(Calendar.MONTH);
+        int currentYear = currentCal.get(Calendar.YEAR);
+
+        int previousMonth = currentMonth - 1;
+        int previousYear = currentYear;
+        if (previousMonth < 0) {
+            previousMonth = 11;
+            previousYear = currentYear - 1;
+        }
 
         for (Transaction transaction : transactions) {
             try {
@@ -252,7 +268,7 @@ public class Main {
                 int transactionMonth = transactionCal.get(Calendar.MONTH);
                 int transactionYear = transactionCal.get(Calendar.YEAR);
 
-                if (transactionMonth == currentMonth && transactionYear == currentYear) {
+                if (transactionMonth == previousMonth && transactionYear == previousYear) {
                     System.out.println(transaction);
                 }
 
@@ -263,9 +279,70 @@ public class Main {
     }
 
     private static void yearToDate() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date today = new Date();
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTime(today);
+        int currentMonth = currentCal.get(Calendar.MONTH);
+        int currentYear = currentCal.get(Calendar.YEAR);
+
+        for (Transaction transaction : transactions) {
+            try {
+                Date transactionDate = formatter.parse(transaction.getDate());
+                Calendar transactionCal = Calendar.getInstance();
+                transactionCal.setTime(transactionDate);
+                int transactionMonth = transactionCal.get(Calendar.MONTH);
+                int transactionYear = transactionCal.get(Calendar.YEAR);
+
+                Calendar startOfYear = Calendar.getInstance();
+                startOfYear.set(Calendar.YEAR, currentYear);
+                startOfYear.set(Calendar.MONTH, Calendar.JANUARY);
+                startOfYear.set(Calendar.DAY_OF_MONTH, 1);
+                startOfYear.set(Calendar.HOUR_OF_DAY, 0);
+                startOfYear.set(Calendar.MINUTE, 0);
+                startOfYear.set(Calendar.SECOND, 0);
+                startOfYear.set(Calendar.MILLISECOND, 0);
+
+                if (transactionDate.after(startOfYear.getTime()) && transactionDate.before(today)) {
+                    System.out.println(transaction);
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error parsing date: " + e.getMessage());
+            }
+        }
     }
 
     private static void viewPreviousYear() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        Date today = new Date();
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTime(today);
+        int currentYear = currentCal.get(Calendar.YEAR);
+        int previousYear = currentYear - 1;
+
+        Calendar startOfPreviousYear = Calendar.getInstance();
+        startOfPreviousYear.set(Calendar.YEAR, previousYear);
+        startOfPreviousYear.set(Calendar.MONTH, Calendar.JANUARY);
+        startOfPreviousYear.set(Calendar.DAY_OF_MONTH, 1);
+        startOfPreviousYear.set(Calendar.HOUR_OF_DAY, 0);
+        startOfPreviousYear.set(Calendar.MINUTE, 0);
+        startOfPreviousYear.set(Calendar.SECOND, 0);
+        startOfPreviousYear.set(Calendar.MILLISECOND, 0);
+
+        for (Transaction transaction : transactions) {
+            try {
+                Date transactionDate = formatter.parse(transaction.getDate());
+
+                if (transactionDate.after(startOfPreviousYear.getTime()) && transactionDate.before(today)) {
+                    System.out.println(transaction);
+                }
+            } catch (Exception e) {
+                System.err.println("Error parsing date: " + e.getMessage());
+            }
+        }
     }
 
     private static void searchByVendor() {
