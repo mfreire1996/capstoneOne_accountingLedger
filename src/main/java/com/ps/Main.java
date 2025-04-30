@@ -57,6 +57,10 @@ public class Main {
             while ((input = bufferedReader.readLine()) != null) {
                 String[] fields = input.split("\\|");
 
+                if (fields.length < 5) {
+                    System.out.println("Invalid input. Going back");
+                }
+
                 String date = fields[0];
                 String time = fields[1];
                 String description = fields[2];
@@ -133,31 +137,35 @@ public class Main {
     }
 
     private static void displayLedgerMenu() {
-        System.out.println("----Welcome to Ledger----");
-        System.out.println("1. View deposits");
-        System.out.println("2. View payments");
-        System.out.println("3. View reports");
-        System.out.println("0. Go back to home page");
-        System.out.print("What would you like to do? ");
 
-        int ledgerMenuCommands = scanner.nextInt();
+        int ledgerMenuCommands;
 
-        switch (ledgerMenuCommands) {
-            case 1:
-                viewingDeposits();
-                break;
-            case 2:
-                viewingPayments();
-                break;
-            case 3:
-                viewingReports();
-                break;
-            case 0:
-                System.out.println("Going back...");
-                break;
-            default:
-                System.out.println("Invalid input, going back");
-        }
+        do {
+            System.out.println("----Welcome to Ledger----");
+            System.out.println("1. View deposits");
+            System.out.println("2. View payments");
+            System.out.println("3. View reports");
+            System.out.println("0. Go back to home page");
+            System.out.print("What would you like to do? ");
+            ledgerMenuCommands = scanner.nextInt();
+
+            switch (ledgerMenuCommands) {
+                case 1:
+                    viewingDeposits();
+                    break;
+                case 2:
+                    viewingPayments();
+                    break;
+                case 3:
+                    viewingReports();
+                    break;
+                case 0:
+                    System.out.println("Going back...");
+                    break;
+                default:
+                    System.out.println("Invalid input, going back");
+            }
+        } while (ledgerMenuCommands != 0);
     }
 
     private static void viewingDeposits() {
@@ -171,49 +179,59 @@ public class Main {
     }
 
     private static void viewingPayments() {
-        for (int i = transactions.size() - 1; i >= 0; i++) {
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions were made");
+            return;
+        }
+
+        for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
-            double amountPaid = transaction.getAmount();
-            if (amountPaid < 0) {
-                System.out.println(transaction);
+            if (transaction.getAmount() < 0) {
+                System.out.println(transaction.getDate() + "|" + transaction.getTime() + "|" +
+                        transaction.getDescription() + "|" + transaction.getVendor()
+                        + "|" + transaction.getAmount());
             }
         }
     }
 
     private static void viewingReports() {
-        System.out.println("----Reports Menu----");
-        System.out.println("1. Months to date");
-        System.out.println("2. Previous Month");
-        System.out.println("3. Year to Date");
-        System.out.println("4. Previous Year");
-        System.out.println("5. Search by Vendor");
-        System.out.println("0. Go Back");
-        System.out.print("What would you like to do? ");
 
-        int reportMenuCommands = scanner.nextInt();
+        int reportMenuCommands;
 
-        switch (reportMenuCommands) {
-            case 1:
-                monthsToDate();
-                break;
-            case 2:
-                previousMonth();
-                break;
-            case 3:
-                yearToDate();
-                break;
-            case 4:
-                viewPreviousYear();
-                break;
-            case 5:
-                searchByVendor();
-                break;
-            case 0:
-                System.out.println("Going back...");
-                break;
-            default:
-                System.out.println("Invalid input, going back");
-        }
+        do {
+            System.out.println("----Reports Menu----");
+            System.out.println("1. Months to date");
+            System.out.println("2. Previous Month");
+            System.out.println("3. Year to Date");
+            System.out.println("4. Previous Year");
+            System.out.println("5. Search by Vendor");
+            System.out.println("0. Go Back");
+            System.out.print("What would you like to do? ");
+            reportMenuCommands = scanner.nextInt();
+
+            switch (reportMenuCommands) {
+                case 1:
+                    monthsToDate();
+                    break;
+                case 2:
+                    previousMonth();
+                    break;
+                case 3:
+                    yearToDate();
+                    break;
+                case 4:
+                    viewPreviousYear();
+                    break;
+                case 5:
+                    searchByVendor();
+                    break;
+                case 0:
+                    System.out.println("Going back...");
+                    break;
+                default:
+                    System.out.println("Invalid input, going back");
+            }
+        } while (reportMenuCommands != 0);
     }
 
     private static void monthsToDate() {
@@ -238,10 +256,9 @@ public class Main {
                 }
 
             } catch (Exception e) {
-                System.err.println("Error parsing date: " + e.getMessage());
+                System.out.println("Error parsing date: " + e.getMessage());
             }
         }
-
     }
 
     private static void previousMonth() {
@@ -273,7 +290,7 @@ public class Main {
                 }
 
             } catch (Exception e) {
-                System.err.println("Error parsing date: " + e.getMessage());
+                System.out.println("Error parsing date: " + e.getMessage());
             }
         }
     }
@@ -309,7 +326,7 @@ public class Main {
                 }
 
             } catch (Exception e) {
-                System.err.println("Error parsing date: " + e.getMessage());
+                System.out.println("Error parsing date: " + e.getMessage());
             }
         }
     }
@@ -340,7 +357,7 @@ public class Main {
                     System.out.println(transaction);
                 }
             } catch (Exception e) {
-                System.err.println("Error parsing date: " + e.getMessage());
+                System.out.println("Error parsing date: " + e.getMessage());
             }
         }
     }
