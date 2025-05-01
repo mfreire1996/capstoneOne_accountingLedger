@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.io.FileReader;
@@ -235,130 +239,88 @@ public class Main {
     }
 
     private static void monthsToDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            LocalDate now = LocalDate.now();
+            LocalDate firstDay = now.withDayOfMonth(1);
 
-        Date today = new Date();
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(today);
-        int currentMonth = currentCal.get(Calendar.MONTH);
-        int currentYear = currentCal.get(Calendar.YEAR);
-
-        for (Transaction transaction : transactions) {
-            try {
-                Date transactionDate = formatter.parse(transaction.getDate());
-                Calendar transactionCal = Calendar.getInstance();
-                transactionCal.setTime(transactionDate);
-                int transactionMonth = transactionCal.get(Calendar.MONTH);
-                int transactionYear = transactionCal.get(Calendar.YEAR);
-
-                if (transactionMonth == currentMonth && transactionYear == currentYear) {
+            for (Transaction transaction : transactions) {
+                LocalDate dateOfTransaction = LocalDate.parse(transaction.getDate());
+                if (!dateOfTransaction.isBefore(firstDay)) {
                     System.out.println(transaction);
                 }
-
-            } catch (Exception e) {
-                System.out.println("Error parsing date: " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
+
     }
 
     private static void previousMonth() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            LocalDate now = LocalDate.now();
+            LocalDate firstDay = now.minusMonths(1).withDayOfMonth(1);
+            LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+            boolean found = false;
 
-        Date today = new Date();
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(today);
-        int currentMonth = currentCal.get(Calendar.MONTH);
-        int currentYear = currentCal.get(Calendar.YEAR);
-
-        int previousMonth = currentMonth - 1;
-        int previousYear = currentYear;
-        if (previousMonth < 0) {
-            previousMonth = 11;
-            previousYear = currentYear - 1;
-        }
-
-        for (Transaction transaction : transactions) {
-            try {
-                Date transactionDate = formatter.parse(transaction.getDate());
-                Calendar transactionCal = Calendar.getInstance();
-                transactionCal.setTime(transactionDate);
-                int transactionMonth = transactionCal.get(Calendar.MONTH);
-                int transactionYear = transactionCal.get(Calendar.YEAR);
-
-                if (transactionMonth == previousMonth && transactionYear == previousYear) {
+            for (Transaction transaction : transactions) {
+                LocalDate date = LocalDate.parse(transaction.getDate());
+                if (!date.isBefore(firstDay) && !date.isAfter(lastDay)) {
                     System.out.println(transaction);
+                    found = true;
                 }
-
-            } catch (Exception e) {
-                System.out.println("Error parsing date: " + e.getMessage());
             }
+            if (!found) {
+                System.out.println("No transaction for this period");
+            }
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     private static void yearToDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            LocalDate now = LocalDate.now();
+            LocalDate startOfYear = LocalDate.of(now.getYear(), 1, 1);
+            boolean found = false;
 
-        Date today = new Date();
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(today);
-        int currentMonth = currentCal.get(Calendar.MONTH);
-        int currentYear = currentCal.get(Calendar.YEAR);
-
-        for (Transaction transaction : transactions) {
-            try {
-                Date transactionDate = formatter.parse(transaction.getDate());
-                Calendar transactionCal = Calendar.getInstance();
-                transactionCal.setTime(transactionDate);
-                int transactionMonth = transactionCal.get(Calendar.MONTH);
-                int transactionYear = transactionCal.get(Calendar.YEAR);
-
-                Calendar startOfYear = Calendar.getInstance();
-                startOfYear.set(Calendar.YEAR, currentYear);
-                startOfYear.set(Calendar.MONTH, Calendar.JANUARY);
-                startOfYear.set(Calendar.DAY_OF_MONTH, 1);
-                startOfYear.set(Calendar.HOUR_OF_DAY, 0);
-                startOfYear.set(Calendar.MINUTE, 0);
-                startOfYear.set(Calendar.SECOND, 0);
-                startOfYear.set(Calendar.MILLISECOND, 0);
-
-                if (transactionDate.after(startOfYear.getTime()) && transactionDate.before(today)) {
+            for (Transaction transaction : transactions){
+                LocalDate transactionDate = LocalDate.parse(transaction.getDate());
+                if (!transactionDate.isBefore(startOfYear) && !transactionDate.isAfter(now)){
                     System.out.println(transaction);
+                    found = true;
                 }
-
-            } catch (Exception e) {
-                System.out.println("Error parsing date: " + e.getMessage());
             }
+
+            if (!found) {
+                System.out.println("No transactions for this year");
+            }
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     private static void viewPreviousYear() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            LocalDate now = LocalDate.now();
+            int previousYear = now.getYear() - 1;
 
-        Date today = new Date();
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(today);
-        int currentYear = currentCal.get(Calendar.YEAR);
-        int previousYear = currentYear - 1;
+            LocalDate startOfPreviousYear = LocalDate.of(previousYear, 1, 1);
+            LocalDate endOfPreviousYear = LocalDate.of(previousYear, 12, 31);
+            boolean found = false;
 
-        Calendar startOfPreviousYear = Calendar.getInstance();
-        startOfPreviousYear.set(Calendar.YEAR, previousYear);
-        startOfPreviousYear.set(Calendar.MONTH, Calendar.JANUARY);
-        startOfPreviousYear.set(Calendar.DAY_OF_MONTH, 1);
-        startOfPreviousYear.set(Calendar.HOUR_OF_DAY, 0);
-        startOfPreviousYear.set(Calendar.MINUTE, 0);
-        startOfPreviousYear.set(Calendar.SECOND, 0);
-        startOfPreviousYear.set(Calendar.MILLISECOND, 0);
-
-        for (Transaction transaction : transactions) {
-            try {
-                Date transactionDate = formatter.parse(transaction.getDate());
-
-                if (transactionDate.after(startOfPreviousYear.getTime()) && transactionDate.before(today)) {
+            for (Transaction transaction : transactions) {
+                LocalDate transactionDate = LocalDate.parse(transaction.getDate());
+                if (!transactionDate.isBefore(startOfPreviousYear) && !transactionDate.isAfter(endOfPreviousYear)) {
                     System.out.println(transaction);
+                    found = true;
                 }
-            } catch (Exception e) {
-                System.out.println("Error parsing date: " + e.getMessage());
             }
+
+            if (!found) {
+                System.out.println("No transactions from the previous year.");
+            }
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
