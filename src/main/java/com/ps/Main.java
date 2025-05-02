@@ -86,6 +86,7 @@ public class Main {
         }
     }
 
+    //gets users input for their deposits
     private static void depositing() {
         scanner.nextLine();
 
@@ -113,6 +114,7 @@ public class Main {
         System.out.println("✅ Deposit successful!");
     }
 
+    //gets users input for their payments
     private static void makingPayment() {
         scanner.nextLine();
         System.out.println("----Make a payment----");
@@ -177,6 +179,7 @@ public class Main {
         } while (ledgerMenuCommands != 0);
     }
 
+    //loops through csv file to show your deposits made
     private static void viewingDeposits() {
         for (int i = transactions.size() - 1; i >= 0; i--) {
             Transaction transaction = transactions.get(i);
@@ -186,7 +189,7 @@ public class Main {
             }
         }
     }
-
+    //loops through csv file to show your payments made
     private static void viewingPayments() {
         if (transactions.isEmpty()) {
             System.out.println("No transactions were made");
@@ -248,6 +251,7 @@ public class Main {
         } while (reportMenuCommands != 0);
     }
 
+    //prints transactions that happened this month
     private static void monthsToDate() {
         try {
             LocalDate now = LocalDate.now();
@@ -265,6 +269,7 @@ public class Main {
 
     }
 
+    //prints transactions from last month
     private static void previousMonth() {
         try {
             LocalDate now = LocalDate.now();
@@ -287,6 +292,7 @@ public class Main {
         }
     }
 
+    //prints all transactions since the start of this year up to today
     private static void yearToDate() {
         try {
             LocalDate now = LocalDate.now();
@@ -309,6 +315,7 @@ public class Main {
         }
     }
 
+    //prints all transactions from previous year
     private static void viewPreviousYear() {
         try {
             LocalDate now = LocalDate.now();
@@ -334,6 +341,7 @@ public class Main {
         }
     }
 
+    //you can find only by vendor's name
     private static void searchByVendor() {
         System.out.println("Please provide a vendor name: ");
         scanner.nextLine();
@@ -354,6 +362,7 @@ public class Main {
         }
     }
 
+    //you can find anything ranging from date to vendor's name
     private static void customSearch() {
         scanner.nextLine(); // clear buffer
 
